@@ -1,0 +1,47 @@
+{
+    "name": "mraiur/google",
+    "description": "Google API Helpers",
+    "keywords": ["google", "helper", "api"],
+    "license": "MIT",
+    "homepage": "http://google.mraiur.com",
+    "support": {
+        "issues": "https://github.com/mraiur/laravel-google/issues",
+        "source": "https://github.com/mraiur/laravel-google"
+    },
+    "authors": [
+        {
+            "name": "Nikolai Ivanov",
+            "email": "mraiur@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "google/apiclient": "1.*"
+    },
+    "replace": {
+
+    },
+    "require-dev": {
+
+    },
+    "autoload": {
+        "classmap": [
+
+        ],
+        "files": [
+
+        ],
+        "psr-4": {
+            "MGoogle\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+
+        }
+    },
+    "suggest": {
+
+    },
+    "minimum-stability": "dev"
+}
