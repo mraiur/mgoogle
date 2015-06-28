@@ -1,5 +1,9 @@
 <?php
 namespace MGoogle {
+    /**
+     * Class Client
+     * @package MGoogle
+     */
     class Client{
         /**
          * $config =>
@@ -26,7 +30,7 @@ namespace MGoogle {
             }
             else
             {
-                if( $AuthCode === null){
+                if( $AuthCode === null ){
                     $authURL = $client->createAuthUrl();
                     header('Location: '.$authURL);
                     die();
@@ -44,13 +48,12 @@ namespace MGoogle {
                     mkdir(dirname($credentialsPath), 0700, true);
                 }
                 file_put_contents($credentialsPath, $accessToken);
-                printf("Credentials saved to %s\n", $credentialsPath);
             }
 
             $client->setAccessToken($accessToken);
 
             // Refresh the token if it's expired.
-            if ($client->isAccessTokenExpired()) {
+            if (  $client->isAccessTokenExpired()) {
                 $client->refreshToken($client->getRefreshToken());
                 file_put_contents($credentialsPath, $client->getAccessToken());
             }

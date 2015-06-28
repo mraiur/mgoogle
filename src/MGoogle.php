@@ -2,11 +2,26 @@
 use MGoogle\Permissions;
 
 namespace MGoogle{
+    /**
+     * Class MGoogle
+     * @package MGoogle
+     */
     class MGoogle{
 
+        /**
+         * @var
+         */
         private static $config;
+        /**
+         * @var
+         */
         private static $authCode;
 
+        /**
+         * @param $config
+         * @param $authCode
+         * @throws \Exception
+         */
         private function prepareAPIConfig($config, $authCode){
             if(!isset($config['PERMISSIONS'])){
                 throw new \Exception('Provide requested PERMISSIONS.');
@@ -31,16 +46,38 @@ namespace MGoogle{
             self::$authCode = $authCode;
         }
 
-        public function Connect($config, $authCode = null)
+        /**
+         * @param $config
+         * @param null $authCode
+         * @return MGoogle
+         * @throws \Exception
+         */
+        public static function Connect($config, $authCode = null)
         {
-            $this->prepareAPIConfig($config, $authCode);
+            $class = new MGoogle();
+            $class->prepareAPIConfig($config, $authCode);
 
+            return $class;
+        }
+
+        /**
+         * @return Google_Client
+         */
+        public function getClient(){
             $client = new Client();
             return $client->connect(self::$config, self::$authCode);
         }
 
-        public function getClient(){
-
+        /**
+         * @return bool
+         */
+        public function isConnected()
+        {
+            $client = $this->getClient();
+            if( $client instanceof \Google_Client  ){
+                return true;
+            }
+            return false;
         }
     }
 }
