@@ -1,7 +1,6 @@
 <?php
-namespace MGoogle\Client {
+namespace MGoogle {
     class Client{
-
         /**
          * $config =>
          * "APP_NAME"
@@ -12,35 +11,42 @@ namespace MGoogle\Client {
          * @param $config
          * @return Google_Client
          */
-        public function createClient($config)
-        {
-            $client = new Google_Client();
-            $client->setApplicationName( $config['APP_NAME'] );
+        public function connect($config, $AuthCode = null) {
+            $client = new \Google_Client();
+            $client->setApplicationName($config['APP_NAME']);
             $client->setScopes($config['APP_SCOPES']);
-            $client->setAuthConfigFile( $config['CLIENT_SECRET_PATH'] );
-            $client->setAccessType('offline');
+            $client->setRedirectUri($config['REDIRECT_URL']);
+            $client->setAuthConfigFile($config['CLIENT_SECRET_PATH']);
+            $client->setAccessType('online');
 
-            // Load previously authorized credentials from a file.
-            $credentialsPath = expandHomeDirectory( $config['CREDENTIALS_PATH']);
+            $credentialsPath = $config['CREDENTIALS_PATH'];
+
             if (file_exists($credentialsPath)) {
                 $accessToken = file_get_contents($credentialsPath);
-            } else {
-                // Request authorization from the user.
-                $authUrl = $client->createAuthUrl();
-                printf("Open the following link in your browser:\n%s\n", $authUrl);
-                print 'Enter verification code: ';
-                $authCode = trim(fgets(STDIN));
+            }
+            else
+            {
+                if( $AuthCode === null){
+                    $authURL = $client->createAuthUrl();
+                    header('Location: '.$authURL);
+                    die();
+                }
+
+                $authCode = trim($AuthCode);
 
                 // Exchange authorization code for an access token.
                 $accessToken = $client->authenticate($authCode);
 
+                $credentialsPath = $config['CREDENTIALS_PATH'];
+
                 // Store the credentials to disk.
-                if(!file_exists(dirname($credentialsPath))) {
+                if (!file_exists(dirname($credentialsPath))) {
                     mkdir(dirname($credentialsPath), 0700, true);
                 }
                 file_put_contents($credentialsPath, $accessToken);
                 printf("Credentials saved to %s\n", $credentialsPath);
             }
+
             $client->setAccessToken($accessToken);
 
             // Refresh the token if it's expired.

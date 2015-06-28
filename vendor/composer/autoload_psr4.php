@@ -6,6 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'MGoogle\\Client\\' => array($baseDir . '/src/Client'),
     'MGoogle\\' => array($baseDir . '/src'),
 );
