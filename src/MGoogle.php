@@ -52,7 +52,7 @@ namespace MGoogle{
          * @return MGoogle
          * @throws \Exception
          */
-        public static function Connect($config, $authCode = null)
+        public static function Init($config, $authCode = null)
         {
             $class = new MGoogle();
             $class->prepareAPIConfig($config, $authCode);
@@ -65,7 +65,12 @@ namespace MGoogle{
          */
         public function getClient(){
             $client = new Client();
-            return $client->connect(self::$config, self::$authCode);
+            return $client->connected(self::$config, self::$authCode);
+        }
+
+        public function Connect(){
+            $client = new Client();
+            return $client->requestPermission(self::$config);
         }
 
         /**
@@ -74,7 +79,8 @@ namespace MGoogle{
         public function isConnected()
         {
             $client = $this->getClient();
-            if( $client instanceof \Google_Client  ){
+            if( $client instanceof \Google_Client  )
+            {
                 return true;
             }
             return false;

@@ -5,6 +5,23 @@ namespace MGoogle {
      * @package MGoogle
      */
     class Client{
+        private function client($config){
+            $client = new \Google_Client();
+            $client->setApplicationName($config['APP_NAME']);
+            $client->setScopes($config['APP_SCOPES']);
+            $client->setRedirectUri($config['REDIRECT_URL']);
+            $client->setAuthConfigFile($config['CLIENT_SECRET_PATH']);
+            $client->setAccessType('online');
+            return $client;
+        }
+
+        public function requestPermission($config){
+            $client = $this->client($config);
+            $authURL = $client->createAuthUrl();
+            header('Location: '.$authURL);
+            die();
+        }
+
         /**
          * $config =>
          * "APP_NAME"
@@ -15,13 +32,8 @@ namespace MGoogle {
          * @param $config
          * @return Google_Client
          */
-        public function connect($config, $AuthCode = null) {
-            $client = new \Google_Client();
-            $client->setApplicationName($config['APP_NAME']);
-            $client->setScopes($config['APP_SCOPES']);
-            $client->setRedirectUri($config['REDIRECT_URL']);
-            $client->setAuthConfigFile($config['CLIENT_SECRET_PATH']);
-            $client->setAccessType('online');
+        public function connected($config, $AuthCode = null) {
+            $client = $this->client($config);
 
             $credentialsPath = $config['CREDENTIALS_PATH'];
 
@@ -30,10 +42,9 @@ namespace MGoogle {
             }
             else
             {
-                if( $AuthCode === null ){
-                    $authURL = $client->createAuthUrl();
-                    header('Location: '.$authURL);
-                    die();
+                if( $AuthCode === null )
+                {
+                    return false;
                 }
 
                 $authCode = trim($AuthCode);
@@ -53,7 +64,14 @@ namespace MGoogle {
             $client->setAccessToken($accessToken);
 
             // Refresh the token if it's expired.
-            if (  $client->isAccessTokenExpired()) {
+            if (  $client->isAccessTokenExpired())
+            {
+                if(!isset($accessToken->refresh_token)) {
+                    echo '<pre>'.print_r($accessToken, true).'</pre>';
+                    die();
+                    return false;
+                }
+
                 $client->refreshToken($client->getRefreshToken());
                 file_put_contents($credentialsPath, $client->getAccessToken());
             }
