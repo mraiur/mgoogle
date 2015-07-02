@@ -18,6 +18,9 @@ namespace MGoogle\Calendar {
          */
         private $entry;
 
+
+        private $id;
+
         /**
          * @param $data
          */
@@ -52,12 +55,34 @@ namespace MGoogle\Calendar {
             }
         }
 
+        private function updateEntry(){
+            $this->id = $this->data['id'];
+            if( isset($this->data['name'])){
+                $this->entry->setSummary( $this->data['name']);
+            }
+        }
+
+        public function getId()
+        {
+            return $this->id;
+        }
+
         /**
          * @return \Google_Service_Calendar_Event
          */
         public function getEntry(){
 
-            $this->entry = new \Google_Service_Calendar_Event($this->eventData);
+            if( isset($this->data['id']) )
+            {
+                if( $this->entry = $this->service->events->get('primary', $this->data['id']) ){
+                    $this->updateEntry();
+                } else {
+                    return false;
+                }
+            } else {
+                $this->entry = new \Google_Service_Calendar_Event($this->eventData);
+            }
+
            return $this->entry;
         }
     }

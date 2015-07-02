@@ -45,6 +45,16 @@ namespace MGoogle
             return $this->service->events->insert($this->calendar, $event->getEntry() );
         }
 
+        public function updateEvent($data){
+            $event = new Event($data);
+
+            if($event)
+            {
+                $update = $this->service->events->update($this->calendar, $event->getId(), $event);
+            }
+            return false;
+        }
+
         /**
          * @return array
          */

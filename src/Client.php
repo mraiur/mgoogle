@@ -66,10 +66,10 @@ namespace MGoogle {
             // Refresh the token if it's expired.
             if (  $client->isAccessTokenExpired())
             {
-                if(!isset($accessToken->refresh_token)) {
-                    echo '<pre>'.print_r($accessToken, true).'</pre>';
-                    die();
-                    return false;
+                if(!isset($accessToken->refresh_token))
+                {
+                    //$this->requestPermission($config);
+                    //return false;
                 }
 
                 $client->refreshToken($client->getRefreshToken());
