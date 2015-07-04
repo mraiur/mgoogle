@@ -1,7 +1,6 @@
 <?php
-use MGoogle\Permissions;
-
 namespace MGoogle{
+    use MGoogle\Permissions;
     /**
      * Class MGoogle
      * @package MGoogle
