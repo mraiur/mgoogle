@@ -9,7 +9,7 @@ namespace MGoogle
      * Class Calendar
      * @package MGoogle
      */
-    class Calendar {
+    class Calendar implements ApiInterface{
         /**
          * @var \Google_Service_Calendar
          */
@@ -23,9 +23,9 @@ namespace MGoogle
         /**
          * @param MGoogle $MGoogle
          */
-        public function __construct(MGoogle $MGoogle)
+        public function __construct(ClientInterface $Client)
         {
-            $this->service = new \Google_Service_Calendar( $MGoogle->getClient() );
+            $this->service = new \Google_Service_Calendar( $Client->apiClient() );
         }
 
         /**

@@ -4,20 +4,31 @@ namespace MGoogle {
      * Class Client
      * @package MGoogle
      */
-    class Client{
-        private function client($config){
+    class Client implements ClientInterface{
+
+        private $config;
+        private $authCode = null;
+        private $googleClient;
+
+        public function __construct($config, $auth = null){
+            $this->config = $config;
+            $this->authCode = trim($auth);
+        }
+
+        private function initClient()
+        {
             $client = new \Google_Client();
-            $client->setApplicationName($config['APP_NAME']);
-            $client->setScopes($config['APP_SCOPES']);
-            $client->setRedirectUri($config['REDIRECT_URL']);
-            $client->setAuthConfigFile($config['CLIENT_SECRET_PATH']);
+            $client->setApplicationName($this->config['APP_NAME']);
+            $client->setScopes($this->config['APP_SCOPES']);
+            $client->setRedirectUri($this->config['REDIRECT_URL']);
+            $client->setAuthConfigFile($this->config['CLIENT_SECRET_PATH']);
             $client->setAccessType('online');
             return $client;
         }
 
-        public function requestPermission($config){
-            $client = $this->client($config);
-            $authURL = $client->createAuthUrl();
+        public function requestConnect(){
+            $this->googleClient = $this->initClient();
+            $authURL = $this->googleClient->createAuthUrl();
             header('Location: '.$authURL);
             die();
         }
@@ -32,50 +43,80 @@ namespace MGoogle {
          * @param $config
          * @return Google_Client
          */
-        public function connected($config, $AuthCode = null) {
-            $client = $this->client($config);
+        public function setup()
+        {
+            $this->googleClient = $this->initClient();
+            return $this;
+        }
 
-            $credentialsPath = $config['CREDENTIALS_PATH'];
+        public function connect(){
+            $credentialsPath = $this->config['CREDENTIALS_PATH'];
 
             if (file_exists($credentialsPath)) {
                 $accessToken = file_get_contents($credentialsPath);
             }
             else
             {
-                if( $AuthCode === null )
+                if( $this->authCode === null )
                 {
                     return false;
                 }
 
-                $authCode = trim($AuthCode);
-
                 // Exchange authorization code for an access token.
-                $accessToken = $client->authenticate($authCode);
+                $accessToken = $this->googleClient->authenticate( $this->authCode);
 
-                $credentialsPath = $config['CREDENTIALS_PATH'];
+                $credentialsPath = $this->config['CREDENTIALS_PATH'];
 
                 // Store the credentials to disk.
-                if (!file_exists(dirname($credentialsPath))) {
+                if (!file_exists(dirname($credentialsPath)))
+                {
                     mkdir(dirname($credentialsPath), 0700, true);
                 }
                 file_put_contents($credentialsPath, $accessToken);
             }
 
-            $client->setAccessToken($accessToken);
+            $this->googleClient->setAccessToken($accessToken);
 
             // Refresh the token if it's expired.
-            if (  $client->isAccessTokenExpired())
+            if ( $this->googleClient->isAccessTokenExpired())
             {
                 if(!isset($accessToken->refresh_token))
                 {
-                    //$this->requestPermission($config);
-                    //return false;
+                    return $this->requestConnect();
                 }
 
-                $client->refreshToken($client->getRefreshToken());
-                file_put_contents($credentialsPath, $client->getAccessToken());
+                $this->googleClient->refreshToken($this->googleClient->getRefreshToken());
+                file_put_contents($credentialsPath, $this->googleClient->getAccessToken());
             }
-            return $client;
+            return $this;
+        }
+
+        public function isConnected()
+        {
+
+            $this->googleClient = $this->initClient();
+
+            $credentialsPath = $this->config['CREDENTIALS_PATH'];
+
+            if (file_exists($credentialsPath)) {
+                $accessToken = file_get_contents($credentialsPath);
+            }
+            else
+            {
+                return false;
+            }
+
+            $this->googleClient->setAccessToken($accessToken);
+
+            if ( $this->googleClient->isAccessTokenExpired())
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public function apiClient(){
+            return $this->googleClient;
         }
     }
 }
