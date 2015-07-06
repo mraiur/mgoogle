@@ -39,10 +39,17 @@ namespace MGoogle
          * @param $data
          * @return \Google_Service_Calendar_Event
          */
-        public function saveEvent($data){
+        public function saveEvent($data)
+        {
             $event = new Event($data);
-
-            return $this->service->events->insert($this->calendar, $event->getEntry() );
+            echo "<pre>".print_r($data, true)."</pre>";
+            if(isset($data['id']))
+            {
+                $event->setEvent( $this->service->events->get($this->calendar, $data['id']) );
+                return $this->service->events->update($this->calendar, $event->getId(), $event->getEntry() );
+            } else {
+                return $this->service->events->insert($this->calendar, $event->getEntry() );
+            }
         }
 
         public function updateEvent($data){

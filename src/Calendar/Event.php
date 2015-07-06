@@ -37,9 +37,15 @@ namespace MGoogle\Calendar {
          * Convert color name to colorId
          */
         private function validate(){
+
+            if( isset($this->data['id'])){
+                $this->id = $this->data['id'];
+            }
+
             if( isset($this->data['name'])){
                 $this->eventData['summary'] = $this->data['name'];
             }
+
             if( isset($this->data['time']) ){
                 $this->eventData['start'] = array(
                     'dateTime' => date('c', $this->data['time'][0]),
@@ -55,11 +61,20 @@ namespace MGoogle\Calendar {
             }
         }
 
+        // TODO remove the duplication of argument checking.
         private function updateEntry(){
-            $this->id = $this->data['id'];
-            if( isset($this->data['name'])){
+
+            if( isset($this->data['name']))
+            {
                 $this->entry->setSummary( $this->data['name']);
             }
+
+            if( isset($this->data['color']))
+            {
+                $this->entry->setColorId( Colors::getColor( $this->data['color'] ) );
+            }
+
+
         }
 
         public function getId()
@@ -67,19 +82,21 @@ namespace MGoogle\Calendar {
             return $this->id;
         }
 
+        public function setEvent(\Google_Service_Calendar_Event $event){
+            $this->entry = $event;
+        }
+
         /**
          * @return \Google_Service_Calendar_Event
          */
         public function getEntry(){
 
-            if( isset($this->data['id']) )
+            if( $this->entry )
             {
-                if( $this->entry = $this->service->events->get('primary', $this->data['id']) ){
-                    $this->updateEntry();
-                } else {
-                    return false;
-                }
-            } else {
+                $this->updateEntry();
+            }
+            else
+            {
                 $this->entry = new \Google_Service_Calendar_Event($this->eventData);
             }
 
