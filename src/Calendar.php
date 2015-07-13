@@ -42,7 +42,6 @@ namespace MGoogle
         public function saveEvent($data)
         {
             $event = new Event($data);
-            echo "<pre>".print_r($data, true)."</pre>";
             if(isset($data['id']))
             {
                 $event->setEvent( $this->service->events->get($this->calendar, $data['id']) );
