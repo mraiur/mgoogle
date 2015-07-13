@@ -56,6 +56,9 @@ namespace MGoogle\Calendar {
                     'timeZone' => 'UTC'
                 );
             }
+            if( isset($this->data['description'])){
+                $this->eventData['description'] = $this->data['description'];
+            }
             if( isset($this->data['color'])){
                 $this->eventData['colorId'] = Colors::getColor( $this->data['color'] );
             }
@@ -73,8 +76,10 @@ namespace MGoogle\Calendar {
             {
                 $this->entry->setColorId( Colors::getColor( $this->data['color'] ) );
             }
-
-
+            if( isset($this->data['description']))
+            {
+                $this->entry->setDescription( $this->data['description'] );
+            }
         }
 
         public function getId()
